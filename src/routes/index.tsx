@@ -181,12 +181,6 @@ function Header() {
             <MessageCircle className="h-3.5 w-3.5" />
             WhatsApp
           </a>
-          <Link
-            to="/admin"
-            className="text-xs text-muted-foreground hover:text-foreground"
-          >
-            Admin
-          </Link>
         </div>
       </div>
     </header>
