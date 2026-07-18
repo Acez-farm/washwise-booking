@@ -172,7 +172,7 @@ function Header() {
           <a href="#contato" className="hover:text-foreground">Contato</a>
         </nav>
         <div className="flex items-center gap-3">
-          <a
+          
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -373,27 +373,34 @@ function BookingWizard() {
     return out;
   }, []);
 
-  void bookings;
-  void blocked;
+  const [submitting, setSubmitting] = useState(false);
 
-  function submit() {
+  async function submit() {
     if (!service || !date || !time) return;
     if (!form.plate || !form.model || !form.name || !form.phone) {
       toast.error("Preencha todos os dados do veículo.");
       return;
     }
-    const b = addBooking({
-      service: service.name,
-      price: service.price,
-      date,
-      time,
-      plate: form.plate.toUpperCase(),
-      model: form.model,
-      name: form.name,
-      phone: form.phone,
-    });
-    setConfirmed({ id: b.id });
-    toast.success("Agendamento confirmado!");
+    setSubmitting(true);
+    try {
+      const b = await addBooking({
+        service: service.name,
+        price: service.price,
+        date,
+        time,
+        plate: form.plate.toUpperCase(),
+        model: form.model,
+        name: form.name,
+        phone: form.phone,
+      });
+      setConfirmed({ id: b.id });
+      toast.success("Agendamento confirmado!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Não foi possível confirmar o agendamento. Tente novamente.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (confirmed) {
@@ -415,9 +422,7 @@ function BookingWizard() {
         <Button
           className="mt-6 rounded-full bg-[image:var(--gradient-primary)] text-primary-foreground hover:opacity-95"
           onClick={() => {
-            setConfirmed(null);
-            setStep(1);
-            setService(null);
+            setConfirmed(null);setService(null);
             setDate("");
             setTime("");
             setForm({ plate: "", model: "", name: "", phone: "" });
@@ -501,7 +506,7 @@ function BookingWizard() {
               <div className="mb-3 text-sm font-medium">Horários disponíveis</div>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
                 {ALL_SLOTS.map((t) => {
-                  const taken = isSlotTaken(date, t);
+                  const taken = isSlotTaken(bookings, blocked, date, t);
                   return (
                     <button
                       key={t}
@@ -600,9 +605,10 @@ function BookingWizard() {
             </Button>
             <Button
               onClick={submit}
-              className="rounded-full bg-[image:var(--gradient-primary)] px-6 text-primary-foreground shadow-[var(--shadow-glow)] hover:opacity-95"
+              disabled={submitting}
+              className="rounded-full bg-[image:var(--gradient-primary)] px-6 text-primary-foreground shadow-[var(--shadow-glow)] hover:opacity-95 disabled:opacity-60"
             >
-              Confirmar agendamento
+              {submitting ? "Confirmando..." : "Confirmar agendamento"}
             </Button>
           </div>
         </div>
@@ -781,7 +787,7 @@ function Footer() {
           <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
             Contato
           </div>
-          <a
+          
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -790,14 +796,14 @@ function Footer() {
             <MessageCircle className="h-4 w-4 text-primary" />
             WhatsApp {WHATSAPP_DISPLAY}
           </a>
-          <a
+          
             href={`tel:+${WHATSAPP_NUMBER}`}
             className="flex items-center gap-2 hover:text-primary"
           >
             <Phone className="h-4 w-4 text-primary" />
             {WHATSAPP_DISPLAY}
           </a>
-          <a
+          
             href={INSTAGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -811,7 +817,7 @@ function Footer() {
           <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
             Endereço
           </div>
-          <a
+          
             href={MAPS_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -831,7 +837,7 @@ function Footer() {
 
 function WhatsAppFloat() {
   return (
-    <a
+    
       href={WHATSAPP_URL}
       target="_blank"
       rel="noopener noreferrer"
@@ -843,3 +849,4 @@ function WhatsAppFloat() {
     </a>
   );
 }
+            setStep(1);
