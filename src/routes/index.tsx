@@ -11,6 +11,10 @@ import {
   Calendar as CalendarIcon,
   Star,
   ArrowRight,
+  MessageCircle,
+  Instagram,
+  MapPin,
+  Phone,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,7 +72,7 @@ const testimonials = [
   {
     name: "Rafael M.",
     car: "BMW 320i",
-    text: "Melhor lava jato da região. Meu carro sai brilhando como novo toda vez.",
+    text: "Melhor lava jato da região do Silveira. Meu carro sai brilhando como novo toda vez.",
   },
   {
     name: "Juliana P.",
@@ -80,7 +84,44 @@ const testimonials = [
     car: "VW Golf GTI",
     text: "Lavagem detalhada surreal. Parece que saiu da concessionária.",
   },
+  {
+    name: "Fernanda L.",
+    car: "Hyundai HB20",
+    text: "Atendimento nota 10! Equipe super educada e o carro ficou impecável por dentro e por fora.",
+  },
+  {
+    name: "Marcos A.",
+    car: "Toyota Corolla",
+    text: "Sou cliente há mais de 2 anos. Confio de olhos fechados no pessoal do Silveira.",
+  },
+  {
+    name: "Camila R.",
+    car: "Fiat Pulse",
+    text: "Localização ótima em BH e preço justo. A higienização interna fez toda diferença.",
+  },
+  {
+    name: "Bruno T.",
+    car: "Chevrolet Onix",
+    text: "Rápido, caprichoso e sempre no horário marcado. Recomendo demais!",
+  },
+  {
+    name: "Patrícia S.",
+    car: "Renault Kwid",
+    text: "Peguei o carro cheirando a novo. Vou voltar toda semana com certeza.",
+  },
 ];
+
+const WHATSAPP_NUMBER = "5531986725866";
+const WHATSAPP_DISPLAY = "(31) 98672-5866";
+const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
+  "Olá! Gostaria de agendar uma lavagem no Lava Jato Silveira."
+)}`;
+const INSTAGRAM_URL =
+  "https://www.instagram.com/lavajatosilveira?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==";
+const ADDRESS = "R. Carlos Turner, 421 - Silveira, Belo Horizonte - MG, 31140-520";
+const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+  "Lava Jato Silveira, R. Carlos Turner, 421, Belo Horizonte MG"
+)}`;
 
 function LandingPage() {
   return (
@@ -91,6 +132,7 @@ function LandingPage() {
       <BookingSection />
       <Testimonials />
       <Footer />
+      <WhatsAppFloat />
     </div>
   );
 }
@@ -103,19 +145,31 @@ function Header() {
           <div className="grid h-9 w-9 place-items-center rounded-xl bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
             <Droplets className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-lg font-black tracking-tight">AquaShine</span>
+          <span className="text-lg font-black tracking-tight">Lava Jato Silveira</span>
         </div>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
           <a href="#servicos" className="hover:text-foreground">Serviços</a>
           <a href="#agendar" className="hover:text-foreground">Agendar</a>
           <a href="#depoimentos" className="hover:text-foreground">Depoimentos</a>
+          <a href="#contato" className="hover:text-foreground">Contato</a>
         </nav>
-        <Link
-          to="/admin"
-          className="text-xs text-muted-foreground hover:text-foreground"
-        >
-          Admin
-        </Link>
+        <div className="flex items-center gap-3">
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden items-center gap-1.5 rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20 sm:inline-flex"
+          >
+            <MessageCircle className="h-3.5 w-3.5" />
+            WhatsApp
+          </a>
+          <Link
+            to="/admin"
+            className="text-xs text-muted-foreground hover:text-foreground"
+          >
+            Admin
+          </Link>
+        </div>
       </div>
     </header>
   );
@@ -139,14 +193,15 @@ function Hero() {
         <div className="space-y-6">
           <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
             <Sparkles className="h-3.5 w-3.5" />
-            Agendamento online em 30 segundos
+            4,5 ★ · 170 avaliações no Google
           </span>
           <h1 className="text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
             Seu carro <span className="text-primary">brilhando</span> sem sair de casa.
           </h1>
           <p className="max-w-lg text-base text-muted-foreground md:text-lg">
-            Escolha o serviço, o horário e pronto. A gente cuida do resto com produtos
-            premium e uma equipe apaixonada por carros.
+            Lava Jato Silveira em Belo Horizonte/MG. Escolha o serviço, o horário e
+            pronto — a gente cuida do resto com produtos premium e uma equipe
+            apaixonada por carros.
           </p>
           <div className="flex flex-wrap gap-3">
             <a href="#agendar">
@@ -158,13 +213,14 @@ function Hero() {
                 <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Button>
             </a>
-            <a href="#servicos">
+            <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer">
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 rounded-full border-border bg-transparent px-6 text-base"
+                className="h-12 rounded-full border-primary/40 bg-transparent px-6 text-base text-primary hover:bg-primary/10"
               >
-                Ver serviços
+                <MessageCircle className="mr-1 h-4 w-4" />
+                Falar no WhatsApp
               </Button>
             </a>
           </div>
@@ -632,14 +688,86 @@ function Testimonials() {
 
 function Footer() {
   return (
-    <footer className="border-t border-border/50 bg-card/40 py-10">
-      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-muted-foreground md:flex-row">
-        <div className="flex items-center gap-2">
-          <Droplets className="h-4 w-4 text-primary" />
-          <span>© {new Date().getFullYear()} AquaShine Lava Jato</span>
+    <footer id="contato" className="border-t border-border/50 bg-card/40 py-14">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 md:grid-cols-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <div className="grid h-9 w-9 place-items-center rounded-xl bg-[image:var(--gradient-primary)]">
+              <Droplets className="h-5 w-5 text-primary-foreground" />
+            </div>
+            <span className="text-lg font-black">Lava Jato Silveira</span>
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Lava-rápido em Belo Horizonte/MG. Nota 4,5 no Google com mais de 170
+            avaliações.
+          </p>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Horário: Seg. a Sáb. a partir das 08:30
+          </p>
         </div>
-        <div>Feito com brilho em São Paulo.</div>
+        <div className="space-y-3 text-sm">
+          <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            Contato
+          </div>
+          <a
+            href={WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-primary"
+          >
+            <MessageCircle className="h-4 w-4 text-primary" />
+            WhatsApp {WHATSAPP_DISPLAY}
+          </a>
+          <a
+            href={`tel:+${WHATSAPP_NUMBER}`}
+            className="flex items-center gap-2 hover:text-primary"
+          >
+            <Phone className="h-4 w-4 text-primary" />
+            {WHATSAPP_DISPLAY}
+          </a>
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 hover:text-primary"
+          >
+            <Instagram className="h-4 w-4 text-primary" />
+            @lavajatosilveira
+          </a>
+        </div>
+        <div className="space-y-3 text-sm">
+          <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+            Endereço
+          </div>
+          <a
+            href={MAPS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-2 hover:text-primary"
+          >
+            <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <span>{ADDRESS}</span>
+          </a>
+        </div>
+      </div>
+      <div className="mx-auto mt-10 max-w-6xl border-t border-border/50 px-4 pt-6 text-center text-xs text-muted-foreground">
+        © {new Date().getFullYear()} Lava Jato Silveira · Belo Horizonte/MG
       </div>
     </footer>
+  );
+}
+
+function WhatsAppFloat() {
+  return (
+    <a
+      href={WHATSAPP_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Falar no WhatsApp"
+      className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-[oklch(0.72_0.19_150)] px-4 py-3 text-sm font-bold text-black shadow-[0_10px_30px_-5px_oklch(0.72_0.19_150_/_0.6)] transition hover:scale-105"
+    >
+      <MessageCircle className="h-5 w-5" />
+      <span className="hidden sm:inline">WhatsApp</span>
+    </a>
   );
 }
