@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   Sparkles,
@@ -15,6 +15,7 @@ import {
   Instagram,
   MapPin,
   Phone,
+  ChevronLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,8 +112,25 @@ const testimonials = [
   },
 ];
 
-const WHATSAPP_NUMBER = "5531986725866";
-const WHATSAPP_DISPLAY = "(31) 98672-5866";
+const extraTestimonials = [
+  { name: "Lucas F.", car: "Honda Civic", text: "Atendimento sensacional. Pontualidade e capricho — meu Civic ficou espelhando." },
+  { name: "Aline C.", car: "Nissan Kicks", text: "Já indiquei pra família toda. Preço honesto e serviço muito bem feito." },
+  { name: "Rodrigo V.", car: "Ford Ranger", text: "Levo a caminhonete cheia de barro e sai zerada. Trabalho impecável!" },
+  { name: "Beatriz N.", car: "Peugeot 208", text: "Amei a aromatização, o carro fica com aquele cheirinho de novo por dias." },
+  { name: "Thiago O.", car: "Mitsubishi L200", text: "Detalhada com cera ficou perfeita. Vale cada centavo, super recomendo." },
+  { name: "Larissa D.", car: "Chevrolet Tracker", text: "Local limpo, equipe simpática e serviço rápido. Fidelizada!" },
+  { name: "Gustavo H.", car: "Volkswagen T-Cross", text: "Melhor custo-benefício do bairro Silveira. Nunca mais lavei em outro lugar." },
+  { name: "Mariana B.", car: "Renault Duster", text: "Agendamento pelo site é super prático. Chegou na hora e entregou no prazo." },
+  { name: "Pedro L.", car: "Toyota Hilux", text: "Motor e rodas ficaram novos. Trabalho detalhista de verdade." },
+  { name: "Isabela M.", car: "Fiat Argo", text: "Sempre saio com o carro impecável. Time atencioso e caprichoso." },
+  { name: "André P.", car: "Kia Sportage", text: "Higienização interna surpreendente. Removeram manchas que eu achei que eram permanentes." },
+  { name: "Renata S.", car: "Volkswagen Polo", text: "Ambiente organizado e serviço rápido. Nota 10 pra equipe do Silveira!" },
+];
+
+const allTestimonials = [...testimonials, ...extraTestimonials];
+
+const WHATSAPP_NUMBER = "5531983992520";
+const WHATSAPP_DISPLAY = "(31) 98399-2520";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   "Olá! Gostaria de agendar uma lavagem no Lava Jato Silveira."
 )}`;
@@ -163,12 +181,6 @@ function Header() {
             <MessageCircle className="h-3.5 w-3.5" />
             WhatsApp
           </a>
-          <Link
-            to="/admin"
-            className="text-xs text-muted-foreground hover:text-foreground"
-          >
-            Admin
-          </Link>
         </div>
       </div>
     </header>
@@ -656,31 +668,91 @@ function Field({
 }
 
 function Testimonials() {
+  const [index, setIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const total = allTestimonials.length;
+  const prev = () => setIndex((i) => (i - 1 + total) % total);
+  const next = () => setIndex((i) => (i + 1) % total);
+
+  function onTouchStart(e: React.TouchEvent) {
+    setTouchStart(e.touches[0].clientX);
+  }
+  function onTouchEnd(e: React.TouchEvent) {
+    if (touchStart === null) return;
+    const delta = e.changedTouches[0].clientX - touchStart;
+    if (delta > 50) prev();
+    else if (delta < -50) next();
+    setTouchStart(null);
+  }
+
   return (
     <section id="depoimentos" className="mx-auto max-w-6xl px-4 py-20">
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-3xl font-black tracking-tight md:text-4xl">
           Amado por quem cuida do carro
         </h2>
+        <p className="mt-3 text-muted-foreground">
+          Mais de {total}+ clientes satisfeitos compartilharam suas experiências.
+        </p>
       </div>
-      <div className="mt-12 grid gap-6 md:grid-cols-3">
-        {testimonials.map((t) => (
+      <div className="relative mx-auto mt-12 max-w-2xl">
+        <div
+          className="overflow-hidden rounded-3xl"
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
           <div
-            key={t.name}
-            className="rounded-2xl border border-border bg-card p-6"
+            className="flex transition-transform duration-500 ease-out"
+            style={{ transform: `translateX(-${index * 100}%)` }}
           >
-            <div className="flex gap-0.5 text-primary">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className="h-4 w-4 fill-current" />
-              ))}
-            </div>
-            <p className="mt-4 text-sm leading-relaxed">"{t.text}"</p>
-            <div className="mt-6 border-t border-border pt-4">
-              <div className="text-sm font-bold">{t.name}</div>
-              <div className="text-xs text-muted-foreground">{t.car}</div>
-            </div>
+            {allTestimonials.map((t) => (
+              <div key={t.name} className="w-full shrink-0 px-1">
+                <div className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-elegant)]">
+                  <div className="flex gap-0.5 text-primary">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                  <p className="mt-5 text-base leading-relaxed md:text-lg">
+                    "{t.text}"
+                  </p>
+                  <div className="mt-6 border-t border-border pt-4">
+                    <div className="text-sm font-bold">{t.name}</div>
+                    <div className="text-xs text-muted-foreground">{t.car}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        <button
+          onClick={prev}
+          aria-label="Depoimento anterior"
+          className="absolute left-0 top-1/2 -translate-x-2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full border border-border bg-background/90 shadow-md backdrop-blur hover:border-primary/40 hover:text-primary md:-translate-x-6"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <button
+          onClick={next}
+          aria-label="Próximo depoimento"
+          className="absolute right-0 top-1/2 translate-x-2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full border border-border bg-background/90 shadow-md backdrop-blur hover:border-primary/40 hover:text-primary md:translate-x-6"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+
+        <div className="mt-6 flex flex-wrap justify-center gap-1.5">
+          {allTestimonials.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              aria-label={`Ir para depoimento ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? "w-6 bg-primary" : "w-1.5 bg-border hover:bg-primary/40"
+              }`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
