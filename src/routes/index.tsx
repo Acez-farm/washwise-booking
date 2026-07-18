@@ -1,0 +1,645 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import {
+  Sparkles,
+  Droplets,
+  ShieldCheck,
+  Clock,
+  Check,
+  ChevronRight,
+  Car,
+  Calendar as CalendarIcon,
+  Star,
+  ArrowRight,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import heroImage from "@/assets/hero-carwash.jpg";
+import {
+  ALL_SLOTS,
+  addBooking,
+  isSlotTaken,
+  useBlockedSlots,
+  useBookings,
+} from "@/lib/bookings-store";
+
+export const Route = createFileRoute("/")({
+  component: LandingPage,
+});
+
+const services = [
+  {
+    id: "simples",
+    name: "Lavagem Simples",
+    price: 35,
+    duration: "30 min",
+    features: ["Lavagem externa", "Secagem premium", "Pretinho nos pneus"],
+  },
+  {
+    id: "completa",
+    name: "Lavagem Completa",
+    price: 60,
+    duration: "1h",
+    features: [
+      "Tudo da Simples",
+      "Aspiração interna",
+      "Limpeza de painel",
+      "Aromatização",
+    ],
+    featured: true,
+  },
+  {
+    id: "detalhada",
+    name: "Lavagem Detalhada",
+    price: 150,
+    duration: "2h30",
+    features: [
+      "Tudo da Completa",
+      "Cera de carnaúba",
+      "Hidratação de couro",
+      "Motor + rodas detalhadas",
+    ],
+  },
+];
+
+const testimonials = [
+  {
+    name: "Rafael M.",
+    car: "BMW 320i",
+    text: "Melhor lava jato da região. Meu carro sai brilhando como novo toda vez.",
+  },
+  {
+    name: "Juliana P.",
+    car: "Jeep Compass",
+    text: "Agendei pelo celular em 30 segundos. Super rápido e o atendimento é impecável.",
+  },
+  {
+    name: "Diego S.",
+    car: "VW Golf GTI",
+    text: "Lavagem detalhada surreal. Parece que saiu da concessionária.",
+  },
+];
+
+function LandingPage() {
+  return (
+    <div className="min-h-screen bg-background text-foreground">
+      <Header />
+      <Hero />
+      <Services />
+      <BookingSection />
+      <Testimonials />
+      <Footer />
+    </div>
+  );
+}
+
+function Header() {
+  return (
+    <header className="sticky top-0 z-40 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+        <div className="flex items-center gap-2">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
+            <Droplets className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <span className="text-lg font-black tracking-tight">AquaShine</span>
+        </div>
+        <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
+          <a href="#servicos" className="hover:text-foreground">Serviços</a>
+          <a href="#agendar" className="hover:text-foreground">Agendar</a>
+          <a href="#depoimentos" className="hover:text-foreground">Depoimentos</a>
+        </nav>
+        <Link
+          to="/admin"
+          className="text-xs text-muted-foreground hover:text-foreground"
+        >
+          Admin
+        </Link>
+      </div>
+    </header>
+  );
+}
+
+function Hero() {
+  return (
+    <section className="relative overflow-hidden">
+      <div
+        className="absolute inset-0 -z-10"
+        style={{ background: "var(--gradient-hero)" }}
+      />
+      <div
+        className="absolute inset-0 -z-10 opacity-30"
+        style={{
+          background:
+            "radial-gradient(circle at 70% 30%, oklch(0.85 0.24 145 / 0.25), transparent 60%)",
+        }}
+      />
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-2 md:items-center md:py-24">
+        <div className="space-y-6">
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+            Agendamento online em 30 segundos
+          </span>
+          <h1 className="text-4xl font-black leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
+            Seu carro <span className="text-primary">brilhando</span> sem sair de casa.
+          </h1>
+          <p className="max-w-lg text-base text-muted-foreground md:text-lg">
+            Escolha o serviço, o horário e pronto. A gente cuida do resto com produtos
+            premium e uma equipe apaixonada por carros.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <a href="#agendar">
+              <Button
+                size="lg"
+                className="group h-12 rounded-full bg-[image:var(--gradient-primary)] px-6 text-base font-bold text-primary-foreground shadow-[var(--shadow-glow)] hover:opacity-95"
+              >
+                Agendar Lavagem
+                <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </Button>
+            </a>
+            <a href="#servicos">
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-12 rounded-full border-border bg-transparent px-6 text-base"
+              >
+                Ver serviços
+              </Button>
+            </a>
+          </div>
+          <div className="flex flex-wrap items-center gap-6 pt-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              Garantia de satisfação
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="h-4 w-4 text-primary" />
+              Pronto em até 2h
+            </div>
+          </div>
+        </div>
+        <div className="relative">
+          <div
+            className="absolute -inset-4 -z-10 rounded-3xl opacity-40 blur-3xl"
+            style={{ background: "var(--gradient-primary)" }}
+          />
+          <img
+            src={heroImage}
+            alt="Carro esportivo preto sendo lavado com espuma"
+            width={1600}
+            height={1200}
+            className="aspect-[4/3] w-full rounded-3xl object-cover shadow-[var(--shadow-elegant)]"
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Services() {
+  return (
+    <section id="servicos" className="mx-auto max-w-6xl px-4 py-20">
+      <div className="mx-auto max-w-2xl text-center">
+        <h2 className="text-3xl font-black tracking-tight md:text-4xl">
+          Escolha o cuidado ideal
+        </h2>
+        <p className="mt-3 text-muted-foreground">
+          Do rápido ao detalhado — preços justos e produtos premium em todas as opções.
+        </p>
+      </div>
+      <div className="mt-12 grid gap-6 md:grid-cols-3">
+        {services.map((s) => (
+          <div
+            key={s.id}
+            className={`relative flex flex-col rounded-2xl border p-6 transition ${
+              s.featured
+                ? "border-primary/40 bg-card shadow-[var(--shadow-glow)]"
+                : "border-border bg-card/60 hover:border-primary/30"
+            }`}
+          >
+            {s.featured && (
+              <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
+                Mais escolhido
+              </span>
+            )}
+            <h3 className="text-xl font-bold">{s.name}</h3>
+            <div className="mt-3 flex items-baseline gap-1">
+              <span className="text-4xl font-black text-primary">
+                R${s.price}
+              </span>
+              <span className="text-sm text-muted-foreground">/ {s.duration}</span>
+            </div>
+            <ul className="mt-6 space-y-3 text-sm">
+              {s.features.map((f) => (
+                <li key={f} className="flex items-start gap-2">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>{f}</span>
+                </li>
+              ))}
+            </ul>
+            <a href="#agendar" className="mt-8">
+              <Button
+                className={`w-full rounded-full ${
+                  s.featured
+                    ? "bg-[image:var(--gradient-primary)] text-primary-foreground hover:opacity-95"
+                    : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                }`}
+              >
+                Agendar este serviço
+              </Button>
+            </a>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BookingSection() {
+  return (
+    <section id="agendar" className="border-y border-border/50 bg-card/40 py-20">
+      <div className="mx-auto max-w-4xl px-4">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            <CalendarIcon className="h-3.5 w-3.5" />
+            Agendamento rápido
+          </span>
+          <h2 className="mt-4 text-3xl font-black tracking-tight md:text-4xl">
+            Reserve seu horário
+          </h2>
+          <p className="mt-3 text-muted-foreground">
+            3 passos simples. Confirmação imediata.
+          </p>
+        </div>
+        <div className="mt-10">
+          <BookingWizard />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BookingWizard() {
+  const bookings = useBookings();
+  const blocked = useBlockedSlots();
+  const [step, setStep] = useState(1);
+  const [service, setService] = useState<(typeof services)[number] | null>(null);
+  const [date, setDate] = useState<string>("");
+  const [time, setTime] = useState<string>("");
+  const [form, setForm] = useState({ plate: "", model: "", name: "", phone: "" });
+  const [confirmed, setConfirmed] = useState<null | { id: string }>(null);
+
+  const dates = useMemo(() => {
+    const out: { value: string; label: string; weekday: string }[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      const value = d.toISOString().slice(0, 10);
+      out.push({
+        value,
+        label: d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }),
+        weekday: d.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", ""),
+      });
+    }
+    return out;
+  }, []);
+
+  void bookings;
+  void blocked;
+
+  function submit() {
+    if (!service || !date || !time) return;
+    if (!form.plate || !form.model || !form.name || !form.phone) {
+      toast.error("Preencha todos os dados do veículo.");
+      return;
+    }
+    const b = addBooking({
+      service: service.name,
+      price: service.price,
+      date,
+      time,
+      plate: form.plate.toUpperCase(),
+      model: form.model,
+      name: form.name,
+      phone: form.phone,
+    });
+    setConfirmed({ id: b.id });
+    toast.success("Agendamento confirmado!");
+  }
+
+  if (confirmed) {
+    return (
+      <div className="rounded-3xl border border-primary/40 bg-card p-8 text-center shadow-[var(--shadow-glow)]">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground">
+          <Check className="h-7 w-7" />
+        </div>
+        <h3 className="mt-4 text-2xl font-black">
+          Tudo certo, {form.name.split(" ")[0]}!
+        </h3>
+        <p className="mt-2 text-muted-foreground">
+          {service?.name} para{" "}
+          <span className="font-semibold text-foreground">{form.model}</span> (
+          {form.plate.toUpperCase()}) —{" "}
+          {new Date(date + "T00:00").toLocaleDateString("pt-BR")} às {time}.
+        </p>
+        <p className="mt-1 text-xs text-muted-foreground">Código: {confirmed.id}</p>
+        <Button
+          className="mt-6 rounded-full bg-[image:var(--gradient-primary)] text-primary-foreground hover:opacity-95"
+          onClick={() => {
+            setConfirmed(null);
+            setStep(1);
+            setService(null);
+            setDate("");
+            setTime("");
+            setForm({ plate: "", model: "", name: "", phone: "" });
+          }}
+        >
+          Fazer outro agendamento
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-elegant)] md:p-8">
+      <StepIndicator step={step} />
+
+      {step === 1 && (
+        <div className="mt-8 space-y-3">
+          <h3 className="text-lg font-bold">1. Escolha o serviço</h3>
+          {services.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => {
+                setService(s);
+                setStep(2);
+              }}
+              className={`flex w-full items-center justify-between rounded-2xl border p-4 text-left transition ${
+                service?.id === s.id
+                  ? "border-primary bg-primary/10"
+                  : "border-border hover:border-primary/40 hover:bg-secondary/50"
+              }`}
+            >
+              <div>
+                <div className="font-bold">{s.name}</div>
+                <div className="text-xs text-muted-foreground">{s.duration}</div>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="font-black text-primary">R${s.price}</span>
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+
+      {step === 2 && service && (
+        <div className="mt-8 space-y-6">
+          <div>
+            <h3 className="text-lg font-bold">2. Escolha data e horário</h3>
+            <p className="text-sm text-muted-foreground">Próximos 7 dias</p>
+          </div>
+
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {dates.map((d) => (
+              <button
+                key={d.value}
+                onClick={() => {
+                  setDate(d.value);
+                  setTime("");
+                }}
+                className={`flex min-w-[72px] shrink-0 flex-col items-center rounded-2xl border p-3 transition ${
+                  date === d.value
+                    ? "border-primary bg-primary/10"
+                    : "border-border hover:border-primary/40"
+                }`}
+              >
+                <span className="text-xs uppercase text-muted-foreground">
+                  {d.weekday}
+                </span>
+                <span className="mt-1 text-lg font-bold">
+                  {d.label.split(" ")[0]}
+                </span>
+                <span className="text-[10px] uppercase text-muted-foreground">
+                  {d.label.split(" ")[1]}
+                </span>
+              </button>
+            ))}
+          </div>
+
+          {date && (
+            <div>
+              <div className="mb-3 text-sm font-medium">Horários disponíveis</div>
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
+                {ALL_SLOTS.map((t) => {
+                  const taken = isSlotTaken(date, t);
+                  return (
+                    <button
+                      key={t}
+                      disabled={taken}
+                      onClick={() => setTime(t)}
+                      className={`rounded-xl border p-3 text-sm font-medium transition ${
+                        time === t
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : taken
+                            ? "cursor-not-allowed border-border/50 bg-muted/40 text-muted-foreground line-through"
+                            : "border-border hover:border-primary/40 hover:bg-secondary/50"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-between gap-3">
+            <Button variant="ghost" onClick={() => setStep(1)} className="rounded-full">
+              Voltar
+            </Button>
+            <Button
+              disabled={!date || !time}
+              onClick={() => setStep(3)}
+              className="rounded-full bg-[image:var(--gradient-primary)] text-primary-foreground hover:opacity-95"
+            >
+              Continuar
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {step === 3 && service && (
+        <div className="mt-8 space-y-6">
+          <h3 className="text-lg font-bold">3. Dados do veículo e contato</h3>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Placa" icon={<Car className="h-4 w-4" />}>
+              <Input
+                value={form.plate}
+                onChange={(e) => setForm({ ...form, plate: e.target.value })}
+                placeholder="ABC-1D23"
+                maxLength={8}
+                className="bg-background"
+              />
+            </Field>
+            <Field label="Modelo do veículo">
+              <Input
+                value={form.model}
+                onChange={(e) => setForm({ ...form, model: e.target.value })}
+                placeholder="Ex: Honda Civic"
+                className="bg-background"
+              />
+            </Field>
+            <Field label="Seu nome">
+              <Input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                placeholder="Como te chamamos?"
+                className="bg-background"
+              />
+            </Field>
+            <Field label="WhatsApp">
+              <Input
+                value={form.phone}
+                onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                placeholder="(11) 99999-0000"
+                className="bg-background"
+              />
+            </Field>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-secondary/40 p-4 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Serviço</span>
+              <span className="font-semibold">{service.name}</span>
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-muted-foreground">Quando</span>
+              <span className="font-semibold">
+                {new Date(date + "T00:00").toLocaleDateString("pt-BR")} · {time}
+              </span>
+            </div>
+            <div className="mt-2 flex items-center justify-between border-t border-border pt-2">
+              <span className="text-muted-foreground">Total</span>
+              <span className="text-lg font-black text-primary">R${service.price}</span>
+            </div>
+          </div>
+
+          <div className="flex justify-between gap-3">
+            <Button variant="ghost" onClick={() => setStep(2)} className="rounded-full">
+              Voltar
+            </Button>
+            <Button
+              onClick={submit}
+              className="rounded-full bg-[image:var(--gradient-primary)] px-6 text-primary-foreground shadow-[var(--shadow-glow)] hover:opacity-95"
+            >
+              Confirmar agendamento
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StepIndicator({ step }: { step: number }) {
+  const steps = ["Serviço", "Horário", "Dados"];
+  return (
+    <div className="flex items-center gap-2">
+      {steps.map((label, i) => {
+        const n = i + 1;
+        const active = n === step;
+        const done = n < step;
+        return (
+          <div key={label} className="flex flex-1 items-center gap-2">
+            <div
+              className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold ${
+                active
+                  ? "bg-primary text-primary-foreground"
+                  : done
+                    ? "bg-primary/30 text-primary"
+                    : "bg-secondary text-muted-foreground"
+              }`}
+            >
+              {done ? <Check className="h-4 w-4" /> : n}
+            </div>
+            <span
+              className={`hidden text-xs sm:inline ${
+                active ? "text-foreground" : "text-muted-foreground"
+              }`}
+            >
+              {label}
+            </span>
+            {i < steps.length - 1 && <div className="h-px flex-1 bg-border" />}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function Field({
+  label,
+  icon,
+  children,
+}: {
+  label: string;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label className="flex items-center gap-2 text-xs uppercase tracking-wide text-muted-foreground">
+        {icon}
+        {label}
+      </Label>
+      {children}
+    </div>
+  );
+}
+
+function Testimonials() {
+  return (
+    <section id="depoimentos" className="mx-auto max-w-6xl px-4 py-20">
+      <div className="mx-auto max-w-2xl text-center">
+        <h2 className="text-3xl font-black tracking-tight md:text-4xl">
+          Amado por quem cuida do carro
+        </h2>
+      </div>
+      <div className="mt-12 grid gap-6 md:grid-cols-3">
+        {testimonials.map((t) => (
+          <div
+            key={t.name}
+            className="rounded-2xl border border-border bg-card p-6"
+          >
+            <div className="flex gap-0.5 text-primary">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="h-4 w-4 fill-current" />
+              ))}
+            </div>
+            <p className="mt-4 text-sm leading-relaxed">"{t.text}"</p>
+            <div className="mt-6 border-t border-border pt-4">
+              <div className="text-sm font-bold">{t.name}</div>
+              <div className="text-xs text-muted-foreground">{t.car}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="border-t border-border/50 bg-card/40 py-10">
+      <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 px-4 text-sm text-muted-foreground md:flex-row">
+        <div className="flex items-center gap-2">
+          <Droplets className="h-4 w-4 text-primary" />
+          <span>© {new Date().getFullYear()} AquaShine Lava Jato</span>
+        </div>
+        <div>Feito com brilho em São Paulo.</div>
+      </div>
+    </footer>
+  );
+}
