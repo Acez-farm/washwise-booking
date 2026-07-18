@@ -668,31 +668,91 @@ function Field({
 }
 
 function Testimonials() {
+  const [index, setIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const total = allTestimonials.length;
+  const prev = () => setIndex((i) => (i - 1 + total) % total);
+  const next = () => setIndex((i) => (i + 1) % total);
+
+  function onTouchStart(e: React.TouchEvent) {
+    setTouchStart(e.touches[0].clientX);
+  }
+  function onTouchEnd(e: React.TouchEvent) {
+    if (touchStart === null) return;
+    const delta = e.changedTouches[0].clientX - touchStart;
+    if (delta > 50) prev();
+    else if (delta < -50) next();
+    setTouchStart(null);
+  }
+
   return (
     <section id="depoimentos" className="mx-auto max-w-6xl px-4 py-20">
       <div className="mx-auto max-w-2xl text-center">
         <h2 className="text-3xl font-black tracking-tight md:text-4xl">
           Amado por quem cuida do carro
         </h2>
+        <p className="mt-3 text-muted-foreground">
+          Mais de {total}+ clientes satisfeitos compartilharam suas experiências.
+        </p>
       </div>
-      <div className="mt-12 grid gap-6 md:grid-cols-3">
-        {testimonials.map((t) => (
+      <div className="relative mx-auto mt-12 max-w-2xl">
+        <div
+          className="overflow-hidden rounded-3xl"
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
           <div
-            key={t.name}
-            className="rounded-2xl border border-border bg-card p-6"
+            className="flex transition-transform duration-500 ease-out"
+            style={{ transform: `translateX(-${index * 100}%)` }}
           >
-            <div className="flex gap-0.5 text-primary">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className="h-4 w-4 fill-current" />
-              ))}
-            </div>
-            <p className="mt-4 text-sm leading-relaxed">"{t.text}"</p>
-            <div className="mt-6 border-t border-border pt-4">
-              <div className="text-sm font-bold">{t.name}</div>
-              <div className="text-xs text-muted-foreground">{t.car}</div>
-            </div>
+            {allTestimonials.map((t) => (
+              <div key={t.name} className="w-full shrink-0 px-1">
+                <div className="rounded-3xl border border-border bg-card p-8 shadow-[var(--shadow-elegant)]">
+                  <div className="flex gap-0.5 text-primary">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-current" />
+                    ))}
+                  </div>
+                  <p className="mt-5 text-base leading-relaxed md:text-lg">
+                    "{t.text}"
+                  </p>
+                  <div className="mt-6 border-t border-border pt-4">
+                    <div className="text-sm font-bold">{t.name}</div>
+                    <div className="text-xs text-muted-foreground">{t.car}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
+        <button
+          onClick={prev}
+          aria-label="Depoimento anterior"
+          className="absolute left-0 top-1/2 -translate-x-2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full border border-border bg-background/90 shadow-md backdrop-blur hover:border-primary/40 hover:text-primary md:-translate-x-6"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <button
+          onClick={next}
+          aria-label="Próximo depoimento"
+          className="absolute right-0 top-1/2 translate-x-2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-full border border-border bg-background/90 shadow-md backdrop-blur hover:border-primary/40 hover:text-primary md:translate-x-6"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+
+        <div className="mt-6 flex flex-wrap justify-center gap-1.5">
+          {allTestimonials.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setIndex(i)}
+              aria-label={`Ir para depoimento ${i + 1}`}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? "w-6 bg-primary" : "w-1.5 bg-border hover:bg-primary/40"
+              }`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
