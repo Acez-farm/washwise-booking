@@ -1,4 +1,5 @@
-import { useSyncExternalStore } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "./supabase";
 
 export type BookingStatus = "Pendente" | "Em Lavagem" | "Concluído";
 
@@ -16,84 +17,119 @@ export interface Booking {
   createdAt: number;
 }
 
-const seed: Booking[] = [
-  {
-    id: "b1",
-    service: "Lavagem Completa",
-    price: 60,
-    date: new Date().toISOString().slice(0, 10),
-    time: "09:00",
-    plate: "ABC-1D23",
-    model: "Honda Civic",
-    name: "Carlos Silva",
-    phone: "(11) 98888-1234",
-    status: "Pendente",
-    createdAt: Date.now() - 3600_000,
-  },
-  {
-    id: "b2",
-    service: "Lavagem Detalhada",
-    price: 150,
-    date: new Date().toISOString().slice(0, 10),
-    time: "11:00",
-    plate: "XYZ-4E56",
-    model: "Toyota Corolla",
-    name: "Marina Souza",
-    phone: "(11) 97777-4321",
-    status: "Em Lavagem",
-    createdAt: Date.now() - 7200_000,
-  },
-];
+interface BookingRow {
+  id: string;
+  service: string;
+  price: number;
+  date: string;
+  time: string;
+  plate: string;
+  model: string;
+  name: string;
+  phone: string;
+  status: BookingStatus;
+  created_at: string;
+}
 
-let bookings: Booking[] = [...seed];
-let blockedSlots: Record<string, string[]> = {}; // date -> [time]
+function mapRow(row: BookingRow): Booking {
+  return {
+    id: row.id,
+    service: row.service,
+    price: row.price,
+    date: row.date,
+    time: row.time,
+    plate: row.plate,
+    model: row.model,
+    name: row.name,
+    phone: row.phone,
+    status: row.status,
+    createdAt: new Date(row.created_at).getTime(),
+  };
+}
 
-const listeners = new Set<() => void>();
-const emit = () => listeners.forEach((l) => l());
-
-function subscribe(fn: () => void) {
-  listeners.add(fn);
-  return () => listeners.delete(fn);
+async function fetchBookings(): Promise<Booking[]> {
+  const { data, error } = await supabase
+    .from("bookings")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as BookingRow[]).map(mapRow);
 }
 
 export function useBookings() {
-  return useSyncExternalStore(
-    subscribe,
-    () => bookings,
-    () => bookings,
-  );
+  const { data } = useQuery({
+    queryKey: ["bookings"],
+    queryFn: fetchBookings,
+    refetchInterval: 15_000,
+  });
+  return data ?? [];
+}
+
+export async function addBooking(
+  b: Omit<Booking, "id" | "status" | "createdAt">,
+): Promise<Booking> {
+  const { data, error } = await supabase
+    .from("bookings")
+    .insert({
+      service: b.service,
+      price: b.price,
+      date: b.date,
+      time: b.time,
+      plate: b.plate,
+      model: b.model,
+      name: b.name,
+      phone: b.phone,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return mapRow(data as BookingRow);
+}
+
+export function useUpdateStatus() {
+  const queryClient = useQueryClient();
+  return async (id: string, status: BookingStatus) => {
+    const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
+    if (error) throw error;
+    queryClient.invalidateQueries({ queryKey: ["bookings"] });
+  };
+}
+
+async function fetchBlockedSlots(): Promise<Record<string, string[]>> {
+  const { data, error } = await supabase.from("blocked_slots").select("date, time");
+  if (error) throw error;
+  const map: Record<string, string[]> = {};
+  for (const row of data as { date: string; time: string }[]) {
+    map[row.date] = [...(map[row.date] ?? []), row.time];
+  }
+  return map;
 }
 
 export function useBlockedSlots() {
-  return useSyncExternalStore(
-    subscribe,
-    () => blockedSlots,
-    () => blockedSlots,
-  );
+  const { data } = useQuery({
+    queryKey: ["blocked-slots"],
+    queryFn: fetchBlockedSlots,
+    refetchInterval: 15_000,
+  });
+  return data ?? {};
 }
 
-export function addBooking(b: Omit<Booking, "id" | "status" | "createdAt">) {
-  const booking: Booking = {
-    ...b,
-    id: `b${Date.now()}`,
-    status: "Pendente",
-    createdAt: Date.now(),
+export function useToggleBlockedSlot() {
+  const queryClient = useQueryClient();
+  return async (date: string, time: string, isCurrentlyBlocked: boolean) => {
+    if (isCurrentlyBlocked) {
+      const { error } = await supabase
+        .from("blocked_slots")
+        .delete()
+        .eq("date", date)
+        .eq("time", time);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from("blocked_slots").insert({ date, time });
+      if (error) throw error;
+    }
+    queryClient.invalidateQueries({ queryKey: ["blocked-slots"] });
   };
-  bookings = [booking, ...bookings];
-  emit();
-  return booking;
-}
-
-export function updateStatus(id: string, status: BookingStatus) {
-  bookings = bookings.map((b) => (b.id === id ? { ...b, status } : b));
-  emit();
-}
-
-export function toggleBlockedSlot(date: string, time: string) {
-  const cur = blockedSlots[date] ?? [];
-  const next = cur.includes(time) ? cur.filter((t) => t !== time) : [...cur, time];
-  blockedSlots = { ...blockedSlots, [date]: next };
-  emit();
 }
 
 export const ALL_SLOTS = [
@@ -108,7 +144,12 @@ export const ALL_SLOTS = [
   "17:00",
 ];
 
-export function isSlotTaken(date: string, time: string) {
+export function isSlotTaken(
+  bookings: Booking[],
+  blockedSlots: Record<string, string[]>,
+  date: string,
+  time: string,
+) {
   const taken = bookings.some(
     (b) => b.date === date && b.time === time && b.status !== "Concluído",
   );
