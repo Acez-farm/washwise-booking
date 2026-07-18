@@ -15,6 +15,7 @@ import {
   Instagram,
   MapPin,
   Phone,
+  ChevronLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -111,8 +112,25 @@ const testimonials = [
   },
 ];
 
-const WHATSAPP_NUMBER = "5531986725866";
-const WHATSAPP_DISPLAY = "(31) 98672-5866";
+const extraTestimonials = [
+  { name: "Lucas F.", car: "Honda Civic", text: "Atendimento sensacional. Pontualidade e capricho — meu Civic ficou espelhando." },
+  { name: "Aline C.", car: "Nissan Kicks", text: "Já indiquei pra família toda. Preço honesto e serviço muito bem feito." },
+  { name: "Rodrigo V.", car: "Ford Ranger", text: "Levo a caminhonete cheia de barro e sai zerada. Trabalho impecável!" },
+  { name: "Beatriz N.", car: "Peugeot 208", text: "Amei a aromatização, o carro fica com aquele cheirinho de novo por dias." },
+  { name: "Thiago O.", car: "Mitsubishi L200", text: "Detalhada com cera ficou perfeita. Vale cada centavo, super recomendo." },
+  { name: "Larissa D.", car: "Chevrolet Tracker", text: "Local limpo, equipe simpática e serviço rápido. Fidelizada!" },
+  { name: "Gustavo H.", car: "Volkswagen T-Cross", text: "Melhor custo-benefício do bairro Silveira. Nunca mais lavei em outro lugar." },
+  { name: "Mariana B.", car: "Renault Duster", text: "Agendamento pelo site é super prático. Chegou na hora e entregou no prazo." },
+  { name: "Pedro L.", car: "Toyota Hilux", text: "Motor e rodas ficaram novos. Trabalho detalhista de verdade." },
+  { name: "Isabela M.", car: "Fiat Argo", text: "Sempre saio com o carro impecável. Time atencioso e caprichoso." },
+  { name: "André P.", car: "Kia Sportage", text: "Higienização interna surpreendente. Removeram manchas que eu achei que eram permanentes." },
+  { name: "Renata S.", car: "Volkswagen Polo", text: "Ambiente organizado e serviço rápido. Nota 10 pra equipe do Silveira!" },
+];
+
+const allTestimonials = [...testimonials, ...extraTestimonials];
+
+const WHATSAPP_NUMBER = "5531983992520";
+const WHATSAPP_DISPLAY = "(31) 98399-2520";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   "Olá! Gostaria de agendar uma lavagem no Lava Jato Silveira."
 )}`;
