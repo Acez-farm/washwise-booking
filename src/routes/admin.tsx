@@ -1,14 +1,19 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
-import { Droplets, ArrowLeft, Clock, CheckCircle2, PlayCircle, Ban } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import type { Session } from "@supabase/supabase-js";
+import { Droplets, ArrowLeft, Clock, CheckCircle2, PlayCircle, Ban, LogOut, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 import {
   ALL_SLOTS,
   type BookingStatus,
-  toggleBlockedSlot,
-  updateStatus,
   useBlockedSlots,
   useBookings,
+  useToggleBlockedSlot,
+  useUpdateStatus,
 } from "@/lib/bookings-store";
 
 export const Route = createFileRoute("/admin")({
@@ -28,8 +33,110 @@ const STATUS_COLORS: Record<BookingStatus, string> = {
 };
 
 function AdminPage() {
+  const [session, setSession] = useState<Session | null | undefined>(undefined);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+    });
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  // undefined = ainda checando; null = não logado; Session = logado
+  if (session === undefined) {
+    return (
+      <div className="grid min-h-screen place-items-center bg-background">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  if (session === null) {
+    return <AdminLogin />;
+  }
+
+  return <AdminDashboard />;
+}
+
+function AdminLogin() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) {
+      toast.error("Login inválido. Confira e-mail e senha.");
+      return;
+    }
+    toast.success("Login realizado!");
+  }
+
+  return (
+    <div className="grid min-h-screen place-items-center bg-background px-4">
+      <form
+        onSubmit={handleLogin}
+        className="w-full max-w-sm rounded-2xl border border-border bg-card p-6"
+      >
+        <div className="mb-6 flex items-center gap-2">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-[image:var(--gradient-primary)]">
+            <Droplets className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <div>
+            <div className="text-sm font-black">AquaShine</div>
+            <div className="text-xs text-muted-foreground">Painel administrativo</div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="email">E-mail</Label>
+            <Input
+              id="email"
+              type="email"
+              autoComplete="username"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="password">Senha</Label>
+            <Input
+              id="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <Button type="submit" disabled={loading} className="w-full rounded-full">
+            {loading ? "Entrando..." : "Entrar"}
+          </Button>
+        </div>
+
+        <Link
+          to="/"
+          className="mt-6 flex items-center justify-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-3 w-3" />
+          Voltar ao site
+        </Link>
+      </form>
+    </div>
+  );
+}
+
+function AdminDashboard() {
   const bookings = useBookings();
   const blocked = useBlockedSlots();
+  const updateStatus = useUpdateStatus();
+  const toggleBlockedSlot = useToggleBlockedSlot();
   const [dateFilter, setDateFilter] = useState<string>(
     new Date().toISOString().slice(0, 10),
   );
@@ -78,12 +185,23 @@ function AdminPage() {
               <div className="text-xs text-muted-foreground">Painel administrativo</div>
             </div>
           </div>
-          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-            <span className="inline-flex items-center gap-1">
-              <ArrowLeft className="h-4 w-4" />
-              Voltar ao site
-            </span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+              <span className="inline-flex items-center gap-1">
+                <ArrowLeft className="h-4 w-4" />
+                Voltar ao site
+              </span>
+            </Link>
+            <button
+              onClick={() => supabase.auth.signOut()}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              <span className="inline-flex items-center gap-1">
+                <LogOut className="h-4 w-4" />
+                Sair
+              </span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -159,17 +277,23 @@ function AdminPage() {
                     <StatusButton
                       current={b.status}
                       target="Pendente"
-                      onClick={() => updateStatus(b.id, "Pendente")}
+                      onClick={() =>
+                        updateStatus(b.id, "Pendente").catch(() => toast.error("Erro ao atualizar."))
+                      }
                     />
                     <StatusButton
                       current={b.status}
                       target="Em Lavagem"
-                      onClick={() => updateStatus(b.id, "Em Lavagem")}
+                      onClick={() =>
+                        updateStatus(b.id, "Em Lavagem").catch(() => toast.error("Erro ao atualizar."))
+                      }
                     />
                     <StatusButton
                       current={b.status}
                       target="Concluído"
-                      onClick={() => updateStatus(b.id, "Concluído")}
+                      onClick={() =>
+                        updateStatus(b.id, "Concluído").catch(() => toast.error("Erro ao atualizar."))
+                      }
                     />
                   </div>
                 </div>
@@ -189,7 +313,11 @@ function AdminPage() {
               return (
                 <button
                   key={t}
-                  onClick={() => toggleBlockedSlot(dateFilter, t)}
+                  onClick={() =>
+                    toggleBlockedSlot(dateFilter, t, isBlocked).catch(() =>
+                      toast.error("Erro ao atualizar horário."),
+                    )
+                  }
                   className={`flex items-center justify-center gap-1 rounded-xl border p-2 text-sm font-medium transition ${
                     isBlocked
                       ? "border-destructive/40 bg-destructive/10 text-destructive"
