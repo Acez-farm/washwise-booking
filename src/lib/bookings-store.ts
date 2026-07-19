@@ -68,22 +68,25 @@ export function useBookings() {
 export async function addBooking(
   b: Omit<Booking, "id" | "status" | "createdAt">,
 ): Promise<Booking> {
-  const { data, error } = await supabase
-    .from("bookings")
-    .insert({
-      service: b.service,
-      price: b.price,
-      date: b.date,
-      time: b.time,
-      plate: b.plate,
-      model: b.model,
-      name: b.name,
-      phone: b.phone,
-    })
-    .select()
-    .single();
+  const id = crypto.randomUUID();
+  const { error } = await supabase.from("bookings").insert({
+    id,
+    service: b.service,
+    price: b.price,
+    date: b.date,
+    time: b.time,
+    plate: b.plate,
+    model: b.model,
+    name: b.name,
+    phone: b.phone,
+  });
   if (error) throw error;
-  return mapRow(data as BookingRow);
+  return {
+    id,
+    ...b,
+    status: "Pendente",
+    createdAt: Date.now(),
+  };
 }
 
 export function useUpdateStatus() {
