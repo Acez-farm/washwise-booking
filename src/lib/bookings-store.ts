@@ -128,7 +128,11 @@ export function useToggleBlockedSlot() {
         .eq("time", time);
       if (error) throw error;
     } else {
-      const { error } = await supabase.from("blocked_slots").insert({ date, time });
+      // upsert + ignoreDuplicates: se o horário já estiver bloqueado
+      // (ex: clique duplo antes da tela atualizar), não gera erro.
+      const { error } = await supabase
+        .from("blocked_slots")
+        .upsert({ date, time }, { onConflict: "date,time", ignoreDuplicates: true });
       if (error) throw error;
     }
     queryClient.invalidateQueries({ queryKey: ["blocked-slots"] });
