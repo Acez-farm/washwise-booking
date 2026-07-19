@@ -422,7 +422,8 @@ function BookingWizard() {
         <Button
           className="mt-6 rounded-full bg-[image:var(--gradient-primary)] text-primary-foreground hover:opacity-95"
           onClick={() => {
-            setConfirmed(null);setService(null);
+            setConfirmed(null);
+            setService(null);
             setDate("");
             setTime("");
             setForm({ plate: "", model: "", name: "", phone: "" });
