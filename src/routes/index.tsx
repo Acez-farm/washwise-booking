@@ -172,7 +172,7 @@ function Header() {
           <a href="#contato" className="hover:text-foreground">Contato</a>
         </nav>
         <div className="flex items-center gap-3">
-          <a
+          
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -789,7 +789,7 @@ function Footer() {
           <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
             Contato
           </div>
-          <a
+          
             href={WHATSAPP_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -798,14 +798,14 @@ function Footer() {
             <MessageCircle className="h-4 w-4 text-primary" />
             WhatsApp {WHATSAPP_DISPLAY}
           </a>
-          <a
+          
             href={`tel:+${WHATSAPP_NUMBER}`}
             className="flex items-center gap-2 hover:text-primary"
           >
             <Phone className="h-4 w-4 text-primary" />
             {WHATSAPP_DISPLAY}
           </a>
-          <a
+          
             href={INSTAGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -819,7 +819,7 @@ function Footer() {
           <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
             Endereço
           </div>
-          <a
+          
             href={MAPS_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -839,7 +839,7 @@ function Footer() {
 
 function WhatsAppFloat() {
   return (
-    <a
+    
       href={WHATSAPP_URL}
       target="_blank"
       rel="noopener noreferrer"
