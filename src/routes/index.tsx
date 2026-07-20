@@ -139,7 +139,7 @@ const allTestimonials = [...testimonials, ...extraTestimonials];
 const WHATSAPP_NUMBER = "5531983992520";
 const WHATSAPP_DISPLAY = "(31) 98399-2520";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Olá! Gostaria de agendar uma lavagem no Lava."
+  "Olá! Gostaria de agendar uma lavagem no Lava Jato."
 )}`;
 const INSTAGRAM_URL = "https://www.instagram.com/";
 const ADDRESS = "Rua Exemplo, 123 - Centro, Belo Horizonte - MG";
@@ -169,7 +169,7 @@ function Header() {
           <div className="grid h-9 w-9 place-items-center rounded-xl bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
             <Droplets className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-lg font-black tracking-tight">Lava</span>
+          <span className="text-lg font-black tracking-tight">Lava Jato</span>
         </div>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
           <a href="#servicos" className="hover:text-foreground">Serviços</a>
@@ -224,7 +224,7 @@ function Hero() {
             Seu carro <span className="text-primary">brilhando</span> sem sair de casa.
           </h1>
           <p className="max-w-lg text-base text-muted-foreground md:text-lg">
-            Lava em Belo Horizonte/MG. Escolha o serviço, o horário e
+            Lava Jato em Belo Horizonte/MG. Escolha o serviço, o horário e
             pronto — a gente cuida do resto com produtos premium e uma equipe
             apaixonada por carros.
           </p>
@@ -788,7 +788,7 @@ function Footer() {
             <div className="grid h-9 w-9 place-items-center rounded-xl bg-[image:var(--gradient-primary)]">
               <Droplets className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-lg font-black">Lava</span>
+            <span className="text-lg font-black">Lava Jato</span>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
             Lava-rápido em Belo Horizonte/MG. Nota 4,5 no Google com mais de 170
@@ -825,7 +825,7 @@ function Footer() {
             className="flex items-center gap-2 hover:text-primary"
           >
             <Instagram className="h-4 w-4 text-primary" />
-            @lavajatosilveira
+            @lavajato
           </a>
         </div>
         <div className="space-y-3 text-sm">
@@ -844,7 +844,7 @@ function Footer() {
         </div>
       </div>
       <div className="mx-auto mt-10 max-w-6xl border-t border-border/50 px-4 pt-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Lava · Belo Horizonte/MG
+        © {new Date().getFullYear()} Lava Jato · Belo Horizonte/MG
       </div>
     </footer>
   );
