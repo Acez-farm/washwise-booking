@@ -172,6 +172,56 @@ function AdminDashboard() {
 
   const blockedForDate = blocked[dateFilter] ?? [];
 
+  const weekStats = useMemo(() => {
+    // Semana atual: segunda a domingo
+    const now = new Date();
+    const dayOfWeek = now.getDay(); // 0 = domingo
+    const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const monday = new Date(now);
+    monday.setHours(0, 0, 0, 0);
+    monday.setDate(now.getDate() + diffToMonday);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+
+    const toISO = (d: Date) => d.toISOString().slice(0, 10);
+    const mondayStr = toISO(monday);
+    const sundayStr = toISO(sunday);
+
+    const weekBookings = bookings.filter((b) => b.date >= mondayStr && b.date <= sundayStr);
+    const total = weekBookings.reduce((sum, b) => sum + b.price, 0);
+    const concluido = weekBookings
+      .filter((b) => b.status === "Concluído")
+      .reduce((sum, b) => sum + b.price, 0);
+    const emAndamento = weekBookings
+      .filter((b) => b.status !== "Concluído")
+      .reduce((sum, b) => sum + b.price, 0);
+
+    // Faturamento por dia da semana, pra mostrar um mini-resumo
+    const porDia: { label: string; value: string; total: number }[] = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(monday);
+      d.setDate(monday.getDate() + i);
+      const value = toISO(d);
+      const totalDia = bookings
+        .filter((b) => b.date === value)
+        .reduce((sum, b) => sum + b.price, 0);
+      porDia.push({
+        label: d.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", ""),
+        value,
+        total: totalDia,
+      });
+    }
+
+    return {
+      total,
+      concluido,
+      emAndamento,
+      count: weekBookings.length,
+      porDia,
+      periodo: `${monday.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} – ${sunday.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}`,
+    };
+  }, [bookings]);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border/50 bg-card/40">
@@ -206,6 +256,45 @@ function AdminDashboard() {
       </header>
 
       <main className="mx-auto max-w-6xl space-y-8 px-4 py-8">
+        <section>
+          <div className="mb-3 flex items-center justify-between">
+            <h1 className="text-2xl font-black">Finanças da semana</h1>
+            <span className="text-xs text-muted-foreground">{weekStats.periodo}</span>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl border border-primary/40 bg-card p-4">
+              <div className="text-xs uppercase text-muted-foreground">Faturamento total</div>
+              <div className="mt-2 text-3xl font-black text-primary">
+                R${weekStats.total.toFixed(2)}
+              </div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {weekStats.count} agendamento{weekStats.count === 1 ? "" : "s"}
+              </div>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-4">
+              <div className="text-xs uppercase text-muted-foreground">Já concluído</div>
+              <div className="mt-2 text-3xl font-black">R${weekStats.concluido.toFixed(2)}</div>
+            </div>
+            <div className="rounded-2xl border border-border bg-card p-4">
+              <div className="text-xs uppercase text-muted-foreground">
+                Pendente / em lavagem
+              </div>
+              <div className="mt-2 text-3xl font-black">R${weekStats.emAndamento.toFixed(2)}</div>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-7 gap-2">
+            {weekStats.porDia.map((d) => (
+              <div
+                key={d.value}
+                className="rounded-xl border border-border bg-card/60 p-3 text-center"
+              >
+                <div className="text-[10px] uppercase text-muted-foreground">{d.label}</div>
+                <div className="mt-1 text-sm font-bold">R${d.total.toFixed(0)}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         <section>
           <div className="mb-3 flex items-center justify-between">
             <h1 className="text-2xl font-black">Agendamentos</h1>

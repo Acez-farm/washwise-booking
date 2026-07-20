@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import {
   Sparkles,
@@ -16,6 +16,7 @@ import {
   MapPin,
   Phone,
   ChevronLeft,
+  Lock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -172,6 +173,13 @@ function Header() {
           <a href="#contato" className="hover:text-foreground">Contato</a>
         </nav>
         <div className="flex items-center gap-3">
+          <Link
+            to="/admin"
+            className="hidden items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-primary/40 hover:text-primary sm:inline-flex"
+          >
+            <Lock className="h-3.5 w-3.5" />
+            Admin
+          </Link>
           <a
             href={WHATSAPP_URL}
             target="_blank"
