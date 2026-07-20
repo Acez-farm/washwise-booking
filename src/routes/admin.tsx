@@ -358,7 +358,7 @@ function AdminDashboard() {
                       </span>
                     </div>
                     <div className="mt-1 text-sm text-muted-foreground">
-                      {b.model} · <span className="font-mono">{b.plate}</span>
+                      {b.model}
                     </div>
                     <div className="text-xs text-muted-foreground">
                       {b.name} · {b.phone} · R${b.price}

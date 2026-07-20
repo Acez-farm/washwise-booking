@@ -368,7 +368,7 @@ function BookingWizard() {
   const [service, setService] = useState<(typeof services)[number] | null>(null);
   const [date, setDate] = useState<string>("");
   const [time, setTime] = useState<string>("");
-  const [form, setForm] = useState({ plate: "", model: "", name: "", phone: "" });
+  const [form, setForm] = useState({ model: "", name: "", phone: "" });
   const [confirmed, setConfirmed] = useState<null | { id: string }>(null);
 
   const dates = useMemo(() => {
@@ -390,7 +390,7 @@ function BookingWizard() {
 
   async function submit() {
     if (!service || !date || !time) return;
-    if (!form.plate || !form.model || !form.name || !form.phone) {
+    if (!form.model || !form.name || !form.phone) {
       toast.error("Preencha todos os dados do veículo.");
       return;
     }
@@ -401,7 +401,7 @@ function BookingWizard() {
         price: service.price,
         date,
         time,
-        plate: form.plate.toUpperCase(),
+        plate: "",
         model: form.model,
         name: form.name,
         phone: form.phone,
@@ -427,8 +427,7 @@ function BookingWizard() {
         </h3>
         <p className="mt-2 text-muted-foreground">
           {service?.name} para{" "}
-          <span className="font-semibold text-foreground">{form.model}</span> (
-          {form.plate.toUpperCase()}) —{" "}
+          <span className="font-semibold text-foreground">{form.model}</span> —{" "}
           {new Date(date + "T00:00").toLocaleDateString("pt-BR")} às {time}.
         </p>
         <p className="mt-1 text-xs text-muted-foreground">Código: {confirmed.id}</p>
@@ -440,7 +439,7 @@ function BookingWizard() {
             setService(null);
             setDate("");
             setTime("");
-            setForm({ plate: "", model: "", name: "", phone: "" });
+            setForm({ model: "", name: "", phone: "" });
           }}
         >
           Fazer outro agendamento
@@ -562,16 +561,7 @@ function BookingWizard() {
         <div className="mt-8 space-y-6">
           <h3 className="text-lg font-bold">3. Dados do veículo e contato</h3>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Placa" icon={<Car className="h-4 w-4" />}>
-              <Input
-                value={form.plate}
-                onChange={(e) => setForm({ ...form, plate: e.target.value })}
-                placeholder="ABC-1D23"
-                maxLength={8}
-                className="bg-background"
-              />
-            </Field>
-            <Field label="Modelo do veículo">
+            <Field label="Modelo do veículo" icon={<Car className="h-4 w-4" />}>
               <Input
                 value={form.model}
                 onChange={(e) => setForm({ ...form, model: e.target.value })}
