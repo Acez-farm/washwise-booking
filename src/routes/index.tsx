@@ -33,6 +33,12 @@ import {
 
 export const Route = createFileRoute("/")({
   component: LandingPage,
+  head: () => ({
+    meta: [
+      { property: "og:image", content: "/imagem-do-carro.png" },
+      { name: "twitter:image", content: "/imagem-do-carro.png" },
+    ],
+  }),
 });
 
 const services = [
