@@ -261,25 +261,27 @@ function AdminDashboard() {
             <h1 className="text-2xl font-black">Finanças da semana</h1>
             <span className="text-xs text-muted-foreground">{weekStats.periodo}</span>
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div className="rounded-2xl border border-primary/40 bg-card p-4">
-              <div className="text-xs uppercase text-muted-foreground">Faturamento total</div>
+              <div className="text-xs uppercase text-muted-foreground">
+                Faturado (concluído)
+              </div>
               <div className="mt-2 text-3xl font-black text-primary">
-                R${weekStats.total.toFixed(2)}
+                R${weekStats.concluido.toFixed(2)}
               </div>
               <div className="mt-1 text-xs text-muted-foreground">
-                {weekStats.count} agendamento{weekStats.count === 1 ? "" : "s"}
+                Lavagens já finalizadas nessa semana
               </div>
-            </div>
-            <div className="rounded-2xl border border-border bg-card p-4">
-              <div className="text-xs uppercase text-muted-foreground">Já concluído</div>
-              <div className="mt-2 text-3xl font-black">R${weekStats.concluido.toFixed(2)}</div>
             </div>
             <div className="rounded-2xl border border-border bg-card p-4">
               <div className="text-xs uppercase text-muted-foreground">
-                Pendente / em lavagem
+                Previsto (todo agendado)
               </div>
-              <div className="mt-2 text-3xl font-black">R${weekStats.emAndamento.toFixed(2)}</div>
+              <div className="mt-2 text-3xl font-black">R${weekStats.total.toFixed(2)}</div>
+              <div className="mt-1 text-xs text-muted-foreground">
+                {weekStats.count} agendamento{weekStats.count === 1 ? "" : "s"} no total (inclui
+                pendentes)
+              </div>
             </div>
           </div>
           <div className="mt-4 grid grid-cols-7 gap-2">
