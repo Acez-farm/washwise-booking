@@ -60,6 +60,7 @@ create policy "Admin pode criar bloqueios"
   with check (true);
 
 -- Só usuário logado (admin) pode REMOVER bloqueios de horário
+# 
 create policy "Admin pode remover bloqueios"
   on public.blocked_slots for delete
   to authenticated
