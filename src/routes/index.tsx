@@ -130,8 +130,8 @@ const extraTestimonials = [
 
 const allTestimonials = [...testimonials, ...extraTestimonials];
 
-const WHATSAPP_NUMBER = "5531988211948";
-const WHATSAPP_DISPLAY = "(31) 98821-1948";
+const WHATSAPP_NUMBER = "5531983992520";
+const WHATSAPP_DISPLAY = "(31) 98399-2520";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
   "Olá! Gostaria de agendar uma lavagem no Lava Jato Silveira."
 )}`;
