@@ -78,17 +78,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lava Jato Silveira — Belo Horizonte/MG" },
+      { title: "Lava — Belo Horizonte/MG" },
       {
         name: "description",
         content:
-          "Lava Jato Silveira em Belo Horizonte/MG. Agende sua lavagem online em segundos: simples, completa ou detalhada. Nota 4,5 (170 avaliações).",
+          "Lava em Belo Horizonte/MG. Agende sua lavagem online em segundos: simples, completa ou detalhada. Nota 4,5 (170 avaliações).",
       },
-      { name: "author", content: "Lava Jato Silveira" },
-      { property: "og:title", content: "Lava Jato Silveira — Belo Horizonte/MG" },
+      { name: "author", content: "Lava" },
+      { property: "og:title", content: "Lava — Belo Horizonte/MG" },
       {
         property: "og:description",
-        content: "Agende sua lavagem online no Lava Jato Silveira. Rápido, prático e brilhante.",
+        content: "Agende sua lavagem online no Lava. Rápido, prático e brilhante.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

@@ -80,7 +80,7 @@ const testimonials = [
   {
     name: "Rafael M.",
     car: "BMW 320i",
-    text: "Melhor lava jato da região do Silveira. Meu carro sai brilhando como novo toda vez.",
+    text: "Melhor lava jato da região. Meu carro sai brilhando como novo toda vez.",
   },
   {
     name: "Juliana P.",
@@ -100,7 +100,7 @@ const testimonials = [
   {
     name: "Marcos A.",
     car: "Toyota Corolla",
-    text: "Sou cliente há mais de 2 anos. Confio de olhos fechados no pessoal do Silveira.",
+    text: "Sou cliente há mais de 2 anos. Confio de olhos fechados na equipe.",
   },
   {
     name: "Camila R.",
@@ -126,12 +126,12 @@ const extraTestimonials = [
   { name: "Beatriz N.", car: "Peugeot 208", text: "Amei a aromatização, o carro fica com aquele cheirinho de novo por dias." },
   { name: "Thiago O.", car: "Mitsubishi L200", text: "Detalhada com cera ficou perfeita. Vale cada centavo, super recomendo." },
   { name: "Larissa D.", car: "Chevrolet Tracker", text: "Local limpo, equipe simpática e serviço rápido. Fidelizada!" },
-  { name: "Gustavo H.", car: "Volkswagen T-Cross", text: "Melhor custo-benefício do bairro Silveira. Nunca mais lavei em outro lugar." },
+  { name: "Gustavo H.", car: "Volkswagen T-Cross", text: "Melhor custo-benefício do bairro. Nunca mais lavei em outro lugar." },
   { name: "Mariana B.", car: "Renault Duster", text: "Agendamento pelo site é super prático. Chegou na hora e entregou no prazo." },
   { name: "Pedro L.", car: "Toyota Hilux", text: "Motor e rodas ficaram novos. Trabalho detalhista de verdade." },
   { name: "Isabela M.", car: "Fiat Argo", text: "Sempre saio com o carro impecável. Time atencioso e caprichoso." },
   { name: "André P.", car: "Kia Sportage", text: "Higienização interna surpreendente. Removeram manchas que eu achei que eram permanentes." },
-  { name: "Renata S.", car: "Volkswagen Polo", text: "Ambiente organizado e serviço rápido. Nota 10 pra equipe do Silveira!" },
+  { name: "Renata S.", car: "Volkswagen Polo", text: "Ambiente organizado e serviço rápido. Nota 10 pra equipe!" },
 ];
 
 const allTestimonials = [...testimonials, ...extraTestimonials];
@@ -139,13 +139,12 @@ const allTestimonials = [...testimonials, ...extraTestimonials];
 const WHATSAPP_NUMBER = "5531983992520";
 const WHATSAPP_DISPLAY = "(31) 98399-2520";
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-  "Olá! Gostaria de agendar uma lavagem no Lava Jato Silveira."
+  "Olá! Gostaria de agendar uma lavagem no Lava."
 )}`;
-const INSTAGRAM_URL =
-  "https://www.instagram.com/lavajatosilveira?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==";
-const ADDRESS = "R. Carlos Turner, 421 - Silveira, Belo Horizonte - MG, 31140-520";
+const INSTAGRAM_URL = "https://www.instagram.com/";
+const ADDRESS = "Rua Exemplo, 123 - Centro, Belo Horizonte - MG";
 const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-  "Lava Jato Silveira, R. Carlos Turner, 421, Belo Horizonte MG"
+  "Rua Exemplo, 123 - Centro, Belo Horizonte MG"
 )}`;
 
 function LandingPage() {
@@ -170,7 +169,7 @@ function Header() {
           <div className="grid h-9 w-9 place-items-center rounded-xl bg-[image:var(--gradient-primary)] shadow-[var(--shadow-glow)]">
             <Droplets className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="text-lg font-black tracking-tight">Lava Jato Silveira</span>
+          <span className="text-lg font-black tracking-tight">Lava</span>
         </div>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
           <a href="#servicos" className="hover:text-foreground">Serviços</a>
@@ -225,7 +224,7 @@ function Hero() {
             Seu carro <span className="text-primary">brilhando</span> sem sair de casa.
           </h1>
           <p className="max-w-lg text-base text-muted-foreground md:text-lg">
-            Lava Jato Silveira em Belo Horizonte/MG. Escolha o serviço, o horário e
+            Lava em Belo Horizonte/MG. Escolha o serviço, o horário e
             pronto — a gente cuida do resto com produtos premium e uma equipe
             apaixonada por carros.
           </p>
@@ -789,7 +788,7 @@ function Footer() {
             <div className="grid h-9 w-9 place-items-center rounded-xl bg-[image:var(--gradient-primary)]">
               <Droplets className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-lg font-black">Lava Jato Silveira</span>
+            <span className="text-lg font-black">Lava</span>
           </div>
           <p className="mt-3 text-sm text-muted-foreground">
             Lava-rápido em Belo Horizonte/MG. Nota 4,5 no Google com mais de 170
@@ -845,7 +844,7 @@ function Footer() {
         </div>
       </div>
       <div className="mx-auto mt-10 max-w-6xl border-t border-border/50 px-4 pt-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} Lava Jato Silveira · Belo Horizonte/MG
+        © {new Date().getFullYear()} Lava · Belo Horizonte/MG
       </div>
     </footer>
   );
